@@ -1,0 +1,94 @@
+* {
+  font-family: Arial, sans-serif;
+}
+
+kbd {
+  background-color: #e4e4e4;
+  color: #601b00;
+  padding: 0.5px 4px;
+  border-radius: 2px;
+  border: 1px solid rgb(0, 0, 0);
+}
+
+p {
+  color: rgb(124, 37, 0);
+}
+
+h1 {
+  text-align: center;
+  background-color: #e8e7e7;
+  color: #361200;
+  padding: 2px 4px;
+  border-radius: 2px;
+  border: 1px solid rgb(0, 0, 0);
+}
+
+#manual {
+  background-color: bisque;
+}
+
+.menu {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+}
+
+.menu li {
+  display: inline;
+  margin-right: 20px;
+}
+
+.menu li a {
+  text-decoration: none;
+  color: #333;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+#simulator {
+  display: grid;
+  height: calc(100vw*9/16);
+  grid-template-columns: 217fr 207fr 212fr 78fr 397fr;  
+  grid-template-rows: 24fr 593fr 27fr 19fr 110fr 25fr 162fr;
+} 
+
+#fenetre-de-vol {
+  grid-column: 1/4; 
+  grid-row: 1/2; 
+}
+
+#vitesse {
+  grid-column: 1; 
+  grid-row: 3/6; 
+}
+#horizon-artif {
+  grid-column: 2; 
+  grid-row: 3 / 6; 
+}
+#altitude {
+  grid-column: 3;
+  grid-row: 3 / 6; 
+}
+#bille {
+  grid-column: 1; 
+  grid-row: 7 / 8; 
+}
+#indicateur-de-cap {
+  grid-column: 2; 
+  grid-row: 7 / 8; 
+}
+#variometre {
+  grid-column: 3; 
+  grid-row: 7 / 8; 
+}
+#onglets{
+  grid-column: 4; 
+  grid-row: 3 / 5;
+}
+#fenetre-onglet {
+  grid-column: 5; 
+  grid-row: 3 / 7;
+}
