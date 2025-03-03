@@ -25,8 +25,6 @@
             <li><a href="manual.html">Manuel</a></li>
         </ul>
     </nav>
-</head>
-<body>
     <div class="grid-container">
         <canvas id="view" class="grid-item"></canvas>
         <canvas id="view" class="grid-item"></canvas>
@@ -64,12 +62,20 @@
 
         const CAM_FOV = 60, CAM_NEAR = 0.1, CAM_FAR = 1000;
         const view = document.getElementById('view');
-        const camera = new THREE.PerspectiveCamera(CAM_FOV, view.clientWidth / view.clientHeight, CAM_NEAR, CAM_FAR);
+        const camera = new THREE.PerspectiveCamera(CAM_FOV, window.innerWidth / window.innerHeight, CAM_NEAR, CAM_FAR);
         const scene = new THREE.Scene();
         const renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true });
 
-        renderer.setSize(view.clientWidth, view.clientHeight);
+        renderer.setSize(window.innerWidth, window.innerHeight);
         camera.position.z = 5;
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        window.addEventListener('resize', onWindowResize);
 
         renderer.setAnimationLoop(() => {  
             renderer.render(scene, camera);
