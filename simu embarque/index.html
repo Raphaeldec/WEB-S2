@@ -1,22 +1,28 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <!-- test commit -->
-    <p>test atelier 4</p>
+    <script type="importmap">
+        {
+          "imports": {
+              "three": "https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.module.js",
+              "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.174.0/examples/jsm/"
+          }
+        }
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="style.css">
     <title>simulateur de vol embarqué</title>
-    <nav>
-    <ul class="menu">
-        <li><a href="index.html">Accueil</a></li>
-        <li><a href="manual.html">Manuel</a></li>
-    </nav>
-    </ul>
 </head>
 <body>
+    <nav>
+        <ul class="menu">
+            <li><a href="index.html">Accueil</a></li>
+            <li><a href="manual.html">Manuel</a></li>
+        </ul>
+    </nav>
     <div class="grid-container">
-        <div id="fenetre-de-vol" class="grid-item">fenetre-de-vol</div>
+        <canvas id="view" class="grid-item"></canvas>
         <div id="vitesse" class="grid-item">vitesse</div>
         <div id="horizon-artif" class="grid-item">horizon-artif</div>
         <div id="altitude" class="grid-item">altitude</div>
@@ -27,12 +33,36 @@
         <div id="fenetre-onglet" class="grid-item">fenetre-onglet</div>
     </div>
     <style>
-        .grid-item {
-            visibility: hidden; 
+        #view {
+            width: 100%;
+            height: 100vh;
+            display: block;
+            background: rgb(0, 0, 0);
         }
     </style>        
-    <main id="simulator">
-        <img src="img/diagramme simu (2).jpg" alt="aperçu de la maquette de vol">
-    </main>
+    <script type="module">
+        import * as THREE from 'three';
+
+        const CAM_FOV = 60, CAM_NEAR = 0.1, CAM_FAR = 1000;
+        const view = document.getElementById('view');
+        const camera = new THREE.PerspectiveCamera(CAM_FOV, window.innerWidth / window.innerHeight, CAM_NEAR, CAM_FAR);
+        const scene = new THREE.Scene();
+        const renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.position.z = 5;
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        window.addEventListener('resize', onWindowResize);
+
+        renderer.setAnimationLoop(() => {  
+            renderer.render(scene, camera);
+        });
+    </script>
 </body>
 </html>
