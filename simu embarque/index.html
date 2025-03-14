@@ -22,8 +22,8 @@
         </ul>
     </nav>
     
-    <div class="grid-container">
-        <canvas id="view" class="grid-item"></canvas>
+    <div id="simulator">
+        <canvas id="fenetre-de-vol" class="grid-item"></canvas>
         
         <div id="vitesse" class="grid-item">vitesse</div>
         <div id="horizon-artif" class="grid-item">
@@ -41,6 +41,7 @@
     </div>   
 
     <script type="module">
+        
         import * as THREE from 'three';
         import { FlyControls } from 'three/addons/controls/FlyControls.js';
 
@@ -53,17 +54,16 @@
         const ROLL_SPEED = 0.5;  // Vitesse de roulis pour FlyControls
 
         // Initialisation de la scène
-        const view = document.getElementById('view');
+        const view = document.getElementById('fenetre-de-vol');
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(SKY_COLOR);
 
         // Caméra
-        const camera = new THREE.PerspectiveCamera(CAM_FOV, window.innerWidth / window.innerHeight, CAM_NEAR, CAM_FAR);
+        const camera = new THREE.PerspectiveCamera(CAM_FOV, view.clientWidth/view.clientHeight, CAM_NEAR, CAM_FAR);
         camera.position.set(0, 100, 500);
 
         // Renderer
         const renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
 
         // Ajout du sol
         const groundGeometry = new THREE.PlaneGeometry(GROUND_SIZE, GROUND_SIZE);
@@ -103,7 +103,6 @@
             controls.update(delta); // Mise à jour des contrôles
             renderer.render(scene, camera);
         });
-
     </script>
 </body>
 </html>
