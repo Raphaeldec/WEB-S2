@@ -1,29 +1,62 @@
 import * as THREE from 'three';
+import { FlyControls } from 'three/addons/controls/FlyControls.js';
 
-// Création de la scène
+// Récupération des éléments HTML
+const view = document.getElementById('fenetre-de-vol');
+const imageFond = document.getElementById('image-fond'); // Image de fond
+const imageCadran = document.getElementById('image-cadran'); // Cadran
+
+// Initialisation de la scène Three.js
 const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87CEEB); // Bleu ciel
 
-// Création de la caméra
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 5;
+// Caméra
+const camera = new THREE.PerspectiveCamera(60, view.clientWidth / view.clientHeight, 0.1, 5000);
+camera.position.set(0, 100, 500);
 
-// Création du rendu
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+// Renderer
+const renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true });
+renderer.setSize(view.clientWidth, view.clientHeight);
 
-// Ajout d'un cube
-const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+// Sol
+const groundGeometry = new THREE.PlaneGeometry(10000, 10000);
+const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x228B22 });
+const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+ground.rotation.x = -Math.PI / 2;
+scene.add(ground);
 
-// Animation
-function animate() {
-    requestAnimationFrame(animate);
-    cube.rotation.x += 0.01;
-    cube.rotation.y += 0.01;
+// Lumières
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+directionalLight.position.set(500, 1000, 500);
+scene.add(directionalLight);
+scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+
+// Contrôles de vol
+const controls = new FlyControls(camera, renderer.domElement);
+controls.dragToLook = true;
+controls.rollSpeed = 0.5;
+controls.movementSpeed = 200;
+const clock = new THREE.Clock();
+
+// Gestion du redimensionnement de l'écran
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// Boucle d'animation
+renderer.setAnimationLoop(() => {  
+    const delta = clock.getDelta();
+    controls.update(delta);
+
+    // Tangage (pitch) et roulis (roll)
+    const pitch = 1.41; // Déplacement vertical en pourcentage
+    const roll = Math.PI / 12; // Rotation en radians
+
+    // Appliquer les transformations aux instruments de vol
+    imageFond.style.transform = `translateY(${pitch}%) rotate(${roll}rad)`;
+    imageCadran.style.transform = `rotate(${roll}rad)`;
+
     renderer.render(scene, camera);
-}
-
-animate();
+});
