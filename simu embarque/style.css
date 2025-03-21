@@ -56,9 +56,16 @@ h1 {
 } 
 
 #fenetre-de-vol {
-  grid-column: 1/4; 
-  grid-row: 1/2; 
+  grid-column: 1/4;
+  grid-row: 1/2;
+  display: block;
+  width: 75%;
+  height: 75%;
+  position: absolute;
+  background: black;
+  z-index: -1;
 }
+
 
 #vitesse {
   grid-column: 1; 

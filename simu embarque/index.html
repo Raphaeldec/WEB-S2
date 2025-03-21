@@ -24,14 +24,16 @@
     
     <div id="simulator">
         <canvas id="fenetre-de-vol" class="grid-item"></canvas>
-        
+
         <div id="vitesse" class="grid-item">vitesse</div>
+
         <div id="horizon-artif" class="grid-item">
             <img src="horizon_back.png" id="image-fond">
             <img src="horizon_mech.png" id="image-aiguille">
-            <img src="horizon_circle.png" id="image-cadran"> <!-- Unique et bien positionné -->
+            <img src="horizon_circle.png" id="image-cadran"> 
             <img src="horizon_frame.png" id="image-marqueurs">
         </div>
+
         <div id="altitude" class="grid-item">altitude</div>
         <div id="bille" class="grid-item">bille</div>
         <div id="indicateur-de-cap" class="grid-item">indicateur-de-cap</div>
@@ -41,66 +43,70 @@
     </div>   
 
     <script type="module">
-        
         import * as THREE from 'three';
         import { FlyControls } from 'three/addons/controls/FlyControls.js';
 
-        // Définition des constantes
-        const CAM_FOV = 60, CAM_NEAR = 0.1, CAM_FAR = 5000;
-        const SKY_COLOR = 0x87CEEB;  // Bleu ciel
-        const GROUND_COLOR = 0x228B22;  // Vert forêt
-        const LIGHT_COLOR = 0xffffff;  // Blanc
-        const GROUND_SIZE = 10000;
-        const ROLL_SPEED = 0.5;  // Vitesse de roulis pour FlyControls
-
-        // Initialisation de la scène
+        const imageFond = document.getElementById('image-fond');
+        const imageCadran = document.getElementById('image-cadran');
         const view = document.getElementById('fenetre-de-vol');
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(SKY_COLOR);
 
-        // Caméra
-        const camera = new THREE.PerspectiveCamera(CAM_FOV, view.clientWidth/view.clientHeight, CAM_NEAR, CAM_FAR);
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87CEEB);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 5000);
         camera.position.set(0, 100, 500);
 
-        // Renderer
         const renderer = new THREE.WebGLRenderer({ canvas: view, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
 
-        // Ajout du sol
-        const groundGeometry = new THREE.PlaneGeometry(GROUND_SIZE, GROUND_SIZE);
-        const groundMaterial = new THREE.MeshStandardMaterial({ color: GROUND_COLOR });
+        const groundGeometry = new THREE.PlaneGeometry(10000, 10000);
+        const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x228B22 });
         const ground = new THREE.Mesh(groundGeometry, groundMaterial);
         ground.rotation.x = -Math.PI / 2;
         scene.add(ground);
 
-        // Ajout d'une lumière directionnelle
-        const directionalLight = new THREE.DirectionalLight(LIGHT_COLOR, 1.5);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
         directionalLight.position.set(500, 1000, 500);
         scene.add(directionalLight);
+        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
-        // Ajout d'une lumière ambiante (complément)
-        const ambientLight = new THREE.AmbientLight(LIGHT_COLOR, 0.5);
-        scene.add(ambientLight);
-
-        // Ajout des contrôles FlyControls
         const controls = new FlyControls(camera, renderer.domElement);
+        controls.dragToLook = true;
+        controls.rollSpeed = 0.5;
+        controls.movementSpeed = 200;
+
         const clock = new THREE.Clock();
 
-        controls.dragToLook = true;
-        controls.rollSpeed = ROLL_SPEED;
-        controls.movementSpeed = 200; // Ajuste la vitesse de déplacement
-
-        // Gestion du redimensionnement
-        function onWindowResize() {
+        window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-        window.addEventListener('resize', onWindowResize);
+        });
 
-        // Boucle d'animation
-        renderer.setAnimationLoop(() => {  
-            const delta = clock.getDelta(); // Temps écoulé depuis la dernière frame
-            controls.update(delta); // Mise à jour des contrôles
+        function computePitchAndRoll() {
+            const q = camera.quaternion;
+            const forward = new THREE.Vector3(0, 0, -1);
+            const upWorld = new THREE.Vector3(0, 1, 0);
+            const rightWorld = new THREE.Vector3(1, 0, 0);
+
+            const forwardRotated = forward.clone().applyQuaternion(q);
+            const rightRotated = rightWorld.clone().applyQuaternion(q);
+
+            const pitch = Math.asin(forwardRotated.dot(upWorld)) * 47;
+            const roll = Math.atan2(rightRotated.y, rightRotated.x);
+
+            return { pitch, roll };
+        }
+
+        renderer.setAnimationLoop(() => {
+            const delta = clock.getDelta();
+            controls.update(delta);
+
+            const { pitch, roll } = computePitchAndRoll();
+
+            imageFond.style.transform = `translateY(${-pitch * 1.5}%) rotate(${roll}rad)`;
+            imageCadran.style.transform = `rotate(${roll}rad)`;
+
             renderer.render(scene, camera);
         });
     </script>
